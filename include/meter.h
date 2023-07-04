@@ -2,19 +2,11 @@
 #define _METER_H_
 
 struct Distance {
-  float start_sampling();
   float get_distance();
-  void polling_echo();
+  void set();
 
   int echoPin;
   int trigPin;
-  int start_time;
-  int echo_start_time;
-  float dura;
-  float meter;
-  bool isSampling=false;
-  bool ready = false;
-  bool echo_started;
 };
 
 /*void meter_loop() {
