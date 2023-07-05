@@ -1,26 +1,24 @@
 #ifndef _METER_H_
 #define _METER_H_
 
-struct Distance {
-  float get_distance();
-  void set();
+class Distance {
+private:
+  static constexpr const unsigned long DLPF_CNT = 3;
 
+public:
+  Distance(int echoPin, int trigPin)
+    : echoPin{ echoPin }, trigPin{ trigPin }
+  { }
+  unsigned int get_cm();
+  void begin();
+
+private:
+  void trigger();
+
+private:
   int echoPin;
   int trigPin;
+  unsigned long fail_dlpf = 0;
 };
-
-/*void meter_loop() {
-  if (!a.isSampling) {
-    a.start_sampling();
-  } 
-  if (a.ready) {
-    float dist = a.get_distance();
-  }
-}
-
-Foo a;
-a.echoPin = 3;
-Foo b;
-b.echoPin = 7;*/
 
 #endif /* _METER_H_ */
