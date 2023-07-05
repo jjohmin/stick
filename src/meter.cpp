@@ -2,20 +2,46 @@
 #include "hurdle.h"
 
 #include <Arduino.h>
+#include <limits.h>
 
-float Distance::get_distance() {
-  int echo = this->echoPin;
-  int trig = this->trigPin;
-  float duration;
-  digitalWrite(trig,HIGH);
-  delayMicroseconds(10);
-    digitalWrite(trig,LOW);
-  duration=pulseIn(echo,HIGH);
-  float m = (((float)(340 * duration) / 10000) / 2) * 100;
-  return m;
-}
+#define PULSE_IN_TIMEOUT (50UL * 1000)
+#define MAX_SENSOR_DELAY 18000
+#define MAX_SENSOR_DISTANCE 500
 
-void Distance::set(){
+
+void Distance::begin() {
   pinMode(echoPin, INPUT);
   pinMode(trigPin, OUTPUT);
+}
+
+#if 1
+/*
+pulse는 최대 38ms 지속되므로 최대 거리는 6.46[m]이다.
+*/
+unsigned int Distance::get_cm() {
+  trigger();
+  auto duration = pulseIn(echoPin, HIGH, PULSE_IN_TIMEOUT);
+  // Serial.print(duration);
+
+  if (!duration) {
+    fail_dlpf = DLPF_CNT;
+    // Serial.println();
+    return UINT_MAX;
+  }
+
+  if (fail_dlpf) {
+    --fail_dlpf;
+    return UINT_MAX;
+  }
+
+  unsigned int cm = 0.017 * duration; // centi meter
+  // Serial.print(' '); Serial.println(cm);
+  return cm;
+}
+#endif
+
+void Distance::trigger() {
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
 }
